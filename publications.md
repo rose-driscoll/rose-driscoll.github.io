@@ -1,6 +1,6 @@
 ---
 layout: post-index
-title: Research
+title: Publications
 ---
 
 Page under construction!
