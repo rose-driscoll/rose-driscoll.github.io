@@ -1,5 +1,5 @@
 ---
-layout: post-index
+layout: home
 excerpt: "Home"
 ---
 
