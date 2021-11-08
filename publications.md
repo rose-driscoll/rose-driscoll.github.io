@@ -1,5 +1,5 @@
 ---
-layout: newpage
+layout: page
 title: Publications
 ---
 
