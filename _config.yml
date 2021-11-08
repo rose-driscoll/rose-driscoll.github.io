@@ -9,7 +9,7 @@ logo: # logo.png # filename of a logo image that has been placed into your image
 owner:
   name: Rose Driscoll
   avatar: 2017-headshot-web-6067-square.jpg
-  bio: Graduate Student at University of Rochester, Biology 
+  bio: #
   email: rdrisco2@ur.rochester.edu
   twitter: #twitter username (no '@')
   linkedin: #linkedin
@@ -39,7 +39,8 @@ owner:
   flickr: #username
   codepen: #username
   disqus-shortname: #username
-  resume: #link to pdf 
+  resume: CV_Driscoll.pdf
+  CV: CV_Driscoll.pdf
 
 # The following adjust the accents for your site. If you would like to further edit colors, fonts, font sizes, etc.
 # you may do so in _sass/variables.scss
