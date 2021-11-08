@@ -9,4 +9,4 @@ B. J. Parker, R. M. H. Driscoll, M. E. Grantham, J. Hrcek, and J. A. Brisson. 20
 
 R. M. H. Driscoll, J. J. Faber-Hammond, C. F. O'Rourke, P. L. Hurd, and S. C. P. Renn. 2020. [“Epigenetic regulation of gonadal and brain aromatase expression in a cichlid fish with environmental sex determination.”](https://www.sciencedirect.com/science/article/pii/S0016648020302914?via%3Dihub) General and Comparative Endocrinology 296. [pdf](/pdf/Driscoll-2020.pdf)
 
-* indicates shared authorship.
+\* indicates shared authorship.
