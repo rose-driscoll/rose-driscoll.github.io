@@ -39,8 +39,7 @@ owner:
   flickr: #username
   codepen: #username
   disqus-shortname: #username
-  resume: CV_Driscoll.pdf
-  CV: CV_Driscoll.pdf
+  resume: #link to a resume
 
 # The following adjust the accents for your site. If you would like to further edit colors, fonts, font sizes, etc.
 # you may do so in _sass/variables.scss
