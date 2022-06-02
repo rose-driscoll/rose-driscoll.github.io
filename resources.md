@@ -5,7 +5,7 @@ title: Resources
 
 ## R/tidyverse
 
-I'm really passionate about [R](https://www.r-project.org/) and specifically about the [tidyverse](https://www.tidyverse.org/) family of R packages, and I've picked up a fair bit of knowledge about it through various classes, workshops, and books (and of course plenty of talking to people and googling and trial and error). A few years ago, I took what I know and built a series of workshops covering what I consider to be the most essential concepts for understanding and using the tidyverse. I've run these workshops in a class-style format a couple of times, but the materials (two Rmd files, below) are also quite intelligible to just read and work through.
+I'm really passionate about [R](https://www.r-project.org/) and specifically about the [tidyverse](https://www.tidyverse.org/) family of R packages, and I've picked up a fair bit of knowledge about it through various classes, workshops, and books (and of course plenty of talking to people and googling and trial and error). A few years ago, I took what I've learned and built a series of workshops covering what I think are the most essential concepts for understanding and using the tidyverse. I've run these workshops in a class-style format a couple of times, but the materials (two Rmd files, below) are also quite intelligible to just read and work through.
 
 These workshops are geared towards people who have some facility with R, but little to no experience with the tidyverse. They are organized as a two-workshop series, with the first part covering various data manipulation tools and the second focusing exclusively on ggplot2. Each part takes approximately 2-3 hours to work through.
 
