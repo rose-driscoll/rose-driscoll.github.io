@@ -10,6 +10,7 @@ I'm really passionate about [R](https://www.r-project.org/) and specifically abo
 These workshops are geared towards people who have some facility with R, but little to no experience with the tidyverse. They are organized as a two-workshop series, with the first part covering various data manipulation tools and the second focusing exclusively on ggplot2. Each part takes approximately 2-3 hours to work through.
 
 [R/tidyverse workshop part 1: Data manipulation](/R_tidyverse_workshop/R_tidyverse_workshop_Part1_data_manipulation.Rmd)
+
 [R/tidyverse workshop part 2: ggplot2](/R_tidyverse_workshop/R_tidyverse_workshop_Part2_ggplot2.Rmd)
 
 Last updated: June 1, 2022
