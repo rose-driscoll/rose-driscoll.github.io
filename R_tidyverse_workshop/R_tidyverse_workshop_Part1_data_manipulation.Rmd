@@ -1,0 +1,514 @@
+---
+title: "R/tidyverse workshop part 1: Data manipulation"
+author: "Rose Driscoll"
+date: "6/1/2022"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, tidy.opts=list(width.cutoff=60))
+
+#install.packages("dplyr")
+#install.packages("tidyr")
+#install.packages("stringr")
+#install.packages("tibble")
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(tibble)
+
+#the tidyverse has been a bit finicky lately, so check that we have ellipsis 0.3.1 as opposed to some earlier version
+sessionInfo()
+#if ellipsis is <0.3.1:
+#install.packages("ellipsis")
+#check it's fixed
+#sessionInfo()
+```
+
+```{r}
+# A few technical specifications:
+# This workshop was designed and built using R 3.4.0, though it is expected to work with newer versions of R as well.
+# It was tested with the following package versions:
+#tibble 3.1.0
+#stringr 1.4.0
+#tidyr 1.1.2
+#dplyr 1.0.4
+# RStudio (https://www.rstudio.com/) is recommended for viewing and running this Rmd file.
+```
+
+
+# Data manipulation basics
+
+**Topics**
+
+1. The tidyverse and tidy data
+2. String manipulation with `stringr`
+3. Data manipulation with `dplyr`
+
+
+# PART 1: The tidyverse and tidy data
+
+The tidyverse (https://www.tidyverse.org/) is a group of R packages that are all based on a common philosophy and grammar. `dplyr` and `ggplot2` are part of the tidyverse, as are `tidyr`, `stringr`, and `tibble` (which we will use today) and `readr`, `purrr`, and `forcats` (which we won't be using). Above, we loaded each of the four tidyverse packages we'll be using today separately, but you can also load all of the tidyverse packages simultaneously with `library(tidyverse)`
+
+## 1. Tidyverse syntax
+
+All tidyverse functions have the same basic syntax:
+
+`function(data, other_arguments)`
+
+Many tidyverse functions are named with a verb describing what you are doing to the data (i.e., gathering, filtering, summarizing, etc.) The first argument is always the data (in data frame format), followed by other arguments. 
+
+Sometimes, these arguments will be the names of columns in the data frame that you want the function to work with. When you refer to columns by name in a tidyverse function, you don't ever have to use `$` the way you do in base R. To refer to a column named `temperature` in a data frame named `weather`, you would do `weather$temperature` in base R. Within a tidyverse function, it's just
+
+`function(weather, temperature)`
+
+This will become more intuitive once we start using tidyverse functions. But first, let's talk about tidy data...
+
+## 2. Tidy data
+
+All tidyverse packages run on tidy data. "Tidy" data means data that is in the long form, with one column for each variable and one row for each observation. 
+
+```{r}
+# some tidy data
+data(airquality)
+head(airquality)
+
+# some untidy data
+data(world_bank_pop)
+head(world_bank_pop)
+```
+
+## 3. Putting data in tidy (long) format
+
+A lot of data that you encounter out in the world doesn't come nicely pre-tidied, so it's important to know how to tidy data for yourself. For this, use the `gather()` function from the `tidyr` package.
+
+```{r}
+# gather(data, key, value, ...)
+# All of the old column names will be gathered in a column named with the key
+# All of the old cells will be gathered into a column named with the value
+# Use - to exclude columns from gathering
+tidy_world_bank_pop <- gather(data = world_bank_pop, key = year, value = population, -country, -indicator)
+head(tidy_world_bank_pop)
+```
+
+Some base R functions do **not** work with tidy data (`prcomp()`, used to perform principal component analysis, is a great example of this) so if you are going back and forth between base R and (for example) `dplyr` you might also need to know how to take data out of tidy (long) format and put it in wide format instead.
+
+```{r}
+# spread(data, key, value)
+# The old column named with the key will be used to create a bunch of columns
+# The old column named with the value will be used to fill the new cells
+untidied_world_bank_pop <- spread(data = tidy_world_bank_pop, key = year, value = population)
+head(untidied_world_bank_pop)
+```
+
+## 4. Dealing with rownames
+
+Another problem you might encounter is data with rownames. Tidyverse functions don't work well with rownames, because rownames are basically like another variable except that they're stored differently from a normal column. Tidyverse functions like to have all of the data in (named) columns so that it can all be handled in the same way. The `tibble` package has a great function for converting rownames into a column...
+
+```{r}
+data(mtcars)
+head(mtcars)
+rownames(mtcars)
+
+mtcars_models <- rownames_to_column(mtcars, "model")
+head(mtcars_models)
+```
+
+## 5. Dealing with column names
+
+Because of the way tidyverse syntax works, you will frequently need to refer to columns in a data frame by name. R doesn't care what these column names are (well, mostly - see note below), but it's a good idea to use column names that are meaningful and easy for you to interpret and remember. `dplyr` provides a simple function for renaming one, several, or all columns in a data frame:
+
+```{r}
+head(mtcars_models)
+mtcars_tidy <- rename(mtcars_models, cylinders = cyl, horsepower = hp, weight_1000 = wt, transmission = am, carburetors = carb)
+head(mtcars_tidy)
+```
+
+
+NOTE: R doesn't care what the column names are... unless they start with a number or have spaces in them. If column names start with a number or have spaces in them, you have to enclose them in backticks when you refer to them:
+
+```{r}
+test <- data.frame(a=c(1,2), b=c(1,2))
+colnames(test) <- c("1", "2")
+#test$1 # this throws an error
+test$`1` # this works though
+
+colnames(test) <- c("column 1", "column 2")
+#test$column 1 # this throws an error
+test$`column 1` # this works though
+
+# the backtick rule applies whether you are working in base R or dplyr.
+```
+
+In general, it's better to avoid column names like this. R tries to help you avoid it by adding an X to the start of any column name that starts with a number when you read in data with `read.csv()` or `read.table()`.
+
+
+# PART 2: String manipulation with stringr
+
+Why do all the `indicator` types in the `world_bank_pop` data start with "SP."? 
+
+```{r}
+head(tidy_world_bank_pop)
+```
+
+That's not very useful. In order to get rid of the SPs, we can manipulate strings with `stringr`.
+
+```{r}
+# extract `indicator` column so that we are just working with a vector of strings for the example
+indicator <- tidy_world_bank_pop$indicator
+head(indicator)
+# use str_sub to extract just the part of the string after the SP.
+# str_sub(string, start, end)
+indicator_clean <- str_sub(indicator, 4, 11)
+head(indicator_clean)
+# default start is first character and default end is last character, so this does the same thing:
+indicator_clean2 <- str_sub(indicator, 4)
+head(indicator_clean2)
+```
+
+Some more `stringr` functions:
+
+```{r}
+data(fruit)
+
+str_detect(fruit, "berry")
+str_which(fruit, "berry")
+str_subset(fruit, "berry")
+str_split(fruit, " ")
+```
+
+You can also use regular expressions with `stringr` functions:
+
+```{r}
+str_subset(fruit, "p[oa]m")
+```
+
+However, a word of caution: while `stringr` is very powerful, it may not always be the best tool for pure string manipulation work. Check the `stringr` tidyverse page (https://stringr.tidyverse.org/) and `stringr` cheatsheet (https://github.com/rstudio/cheatsheets/blob/main/strings.pdf) to see what sorts of functionality `stringr` has to offer. Python or advanced command line tools might be a better choice for some kinds of string manipulation problems.
+
+
+# PART 3: Data manipulation with dplyr
+
+`dplyr` is what I would consider to be the "meat" of the tidyverse's data manipulation tools. 
+
+## 1. Single-table operations
+
+These are sometimes known as the "seven verbs of dplyr", although there are actually at least eleven basic functions... 
+
+### Select
+
+`select()` allows you to select columns from a data frame, dropping columns that aren't mentioned.
+
+```{r}
+select(mtcars_tidy, model, mpg, cylinders)
+```
+
+You can also use - to drop named columns:
+
+```{r}
+select(mtcars_tidy, -qsec, -vs)
+```
+
+You can also rename columns with `select()`:
+
+```{r}
+select(mtcars_tidy, model, miles_per_gallon = mpg, cylinders)
+```
+
+And if you want to change the order of your columns, `select()` can do that too!
+
+```{r}
+select(mtcars_tidy, cylinders, vs, mpg, model)
+# now model is on the far right instead of the far left
+```
+
+
+### Filter
+
+`filter()` is used to filter the rows of a data frame based on one or more conditions.
+
+```{r}
+filter(mtcars_tidy, cylinders > 6, transmission == 1)
+filter(mtcars_tidy, model == "Valiant")
+```
+
+If you want to apply more than one condition to a single variable, boolean operators (&, |, etc.) can come in handy:
+
+```{r}
+filter(mtcars_tidy, mpg > 20 & mpg < 25)
+# for &, simply supplying the two conditions separately does the same thing
+filter(mtcars_tidy, mpg > 20, mpg < 25)
+# but this doesn't work for any other operators
+filter(mtcars_tidy, gear == 3 | gear == 5)
+```
+
+
+### Sample_n and sample_frac
+
+If you want a random subset of the rows of a data frame, use `sample_n()` to pull out a specified number of rows or `sample_frac()` to pull out a specified fraction of the rows.
+
+```{r}
+sample_n(mtcars_tidy, 5) # randomly sample 5 rows
+sample_frac(mtcars_tidy, 0.5) # randomly sample half of the rows
+sample_frac(mtcars_tidy) # if you don't supply a fraction, it gives you all of the rows back in random order, which can sometimes be useful
+```
+
+### Mutate and transmute
+
+`mutate()` is used to create new columns in a data frame by applying some sort of a function or rule. `transmute()` does the same, but drops all of the old columns and only returns the new one.
+
+```{r}
+mutate(mtcars_tidy, weight = weight_1000*1000)
+# can use 2 variables (though this isn't super meaningful for this particular dataset)
+mutate(mtcars_tidy, cyl_x_gear = cylinders*gear)
+# can combine this with ifelse()
+mutate(mtcars_tidy, engine = ifelse(vs==0, "V", "S"))
+```
+
+```{r}
+transmute(mtcars_tidy, weight = weight_1000*1000)
+```
+
+You can create more than one column at at time, and even use columns you've just created to create even more columns in the same command:
+
+```{r}
+mutate(mtcars_tidy, weight = weight_1000*1000, engine = ifelse(vs==0, "V", "S"))
+
+mutate(mtcars_tidy, engine = ifelse(vs==0, "V", "S"), engine_config = paste(engine, cylinders, sep = ""))
+```
+
+### Arrange
+
+`arrange()` is used to order the rows in a data frame according to the values of one (or more) variables. Use `desc()` to get values in descending order (highest to lowest or Z to A).
+
+```{r}
+arrange(mtcars_tidy, model)
+arrange(mtcars_tidy, cylinders, desc(mpg))
+```
+
+### Distinct and count
+
+`distinct()` returns all unique rows of a data frame or of specified columns of a dataframe, dropping duplicates.
+
+```{r}
+redundant_data <- data.frame(a=c(1,1,1,2,2,2), b=c(1,1,2,3,3,3), c=c(1,1,2,2,3,3))
+head(redundant_data)
+# whole table (i.e., all columns considered)
+distinct(redundant_data)
+# just columns a and b
+distinct(redundant_data, a, b)
+
+# rows do not have to be sorted / arranged
+```
+
+To find out how many observations of each distinct kind there were, use `count()` and specify which columns you want distinct combinations of.
+
+```{r}
+# newly created column `n` is the number of times that combination appeared
+count(redundant_data, a, b, c)
+count(redundant_data, a, b)
+
+# if you don't specify any columns it just tells you the number of rows
+count(redundant_data)
+```
+
+By itself, `distinct()` isn't usually all that useful, though `count()` is a little more handy.
+
+### Summarize
+
+`summarize()` applies one or more summary functions to a data frame (`min()`, `max()`, `mean()`, etc.)
+
+```{r}
+summarize(mtcars_tidy, mean_mpg = mean(mpg), max_horsepower = max(horsepower))
+```
+
+By itself, `summarize()` can be useful but isn't all that exciting.
+
+### Group_by
+
+`group_by()` invisibly groups a data frame by one or more variables; if you look at the output, the rows are in the exact same order, but R knows that they are now in groups.
+
+```{r}
+group_by(mtcars_tidy, vs, transmission)
+# compare to arrange() which visibly changes the order of the rows (but doesn't invisibly group them)
+arrange(mtcars_tidy, vs, transmission)
+```
+
+`group_by()` is completely useless on its own, which is why we need to talk about the pipe!
+
+## 2. The pipe `%>%`
+
+The pipe (`%>%`) is an operator that performs a very simple action: it takes the output of the preceding function and inserts it as the first argument of the following function.
+
+```{r}
+filter(mtcars_tidy, cylinders == 8) %>%
+  select(model, mpg, cylinders) # no need to supply the data frame as it is piped from the previous line
+```
+
+Since all of the tidyverse functions have the data frame as their first argument, it's easy to combine them with the pipe. You can link together as many commands as you like and run them all together, without creating any intermediate variables or wrapping functions around each other (`filter(select(mutate(...)))` would get old real fast...)
+
+```{r}
+select(mtcars_tidy, -disp, -drat, -qsec, -carburetors) %>%
+  mutate(engine = ifelse(vs==0, "V", "S"), weight = weight_1000*1000) %>%
+  filter(engine == "V", horsepower > 200) %>%
+  arrange(desc(mpg))
+```
+
+`group_by()` becomes an incredibly powerful tool when you pipe the output to `summarize()` - instead of being applied to the whole data frame, the function is instead applied to each group separately. `distinct()` has a similar effect, by the way.
+
+```{r}
+group_by(mtcars_tidy, cylinders) %>%
+  summarize(mean_mpg = mean(mpg))
+# gives you the mean for each group
+
+group_by(mtcars_tidy, cylinders, vs) %>%
+  distinct(transmission)
+# gives you all the unique combinations of cylinder number, engine configuration, and transmission type
+```
+
+And the pipe isn't just for use with `dplyr` functions - it's easy to use with anything in the tidyverse. Here, I'm piping the output of `gather()` into a bunch of `dplyr` functions, but this will become particularly useful when combined with `ggplot2`.
+
+```{r}
+world_bank_pop_2000s <- gather(data = world_bank_pop, key = year, value = population, -country, -indicator) %>%
+  mutate(indicator2 = str_sub(indicator, 4), year = as.numeric(year)) %>%
+  select(country, indicator2, year, population) %>%
+  filter(year < 2010)
+sample_n(world_bank_pop_2000s, 15)
+
+# you can use the assignment operator at the start or at the end
+gather(data = world_bank_pop, key = year, value = population, -country, -indicator) %>%
+  mutate(indicator2 = str_sub(indicator, 4), year = as.numeric(year)) %>%
+  select(country, indicator2, year, population) %>%
+  filter(year < 2010) -> world_bank_pop_2000s
+# Putting it at the end can make your code more or less readable, depending on who's reading
+# On the one hand, putting it at the end mimics the flow of the data
+# On the other hand, some people automatically scan the left margin for variable assignments and putting it at the end will trip them up
+```
+
+You can also use the pipe with functions from base R and other packages, even ones that don't have `data` as the first argument. Just use `.` to tell R where to put the data it's piping if you don't want it to be the first argument.
+
+```{r}
+data.frame(a=c(1,2), b=c(1,2)) %>%
+  list("a", .)
+```
+
+
+## 3. Working with multiple data frames
+
+In addition to its single-table verbs, `dplyr()` also has a set of functions that are used for combining data frames in different ways. These come in a couple of different types: 
+
+1. Functions that combine columns
+2. Functions that combine or otherwise work with rows
+
+### Functions that combine columns
+
+`dplyr` supplies four row-aware functions that combine columns from two data frames: `left_join()`, `right_join()`, `inner_join()`, and `full_join()`. The four functions differ in how they handle rows that do not match between data frames. Run the following code to see the differences:
+
+```{r}
+mice_color <- data.frame(name = c("Mouse 1", "Mouse 2", "Mouse 3", "Mouse 4"), color = c("black", "brown", "white", "brown"), stringsAsFactors = FALSE)
+mice_weight <- data.frame(name = c("Mouse 1", "Mouse 2", "Mouse 3", "Mouse 5"), weight = c(20, 25, 18, 22), stringsAsFactors = FALSE)
+
+# exception to dplyr's "just refer to columns by name" rule: when you tell any of the following functions which column to join by, you have to put the column name in quotation marks.
+
+# left_join
+left_join(mice_color, mice_weight, by = "name")
+# right_join
+right_join(mice_color, mice_weight, by = "name")
+# inner_join
+inner_join(mice_color, mice_weight, by = "name")
+# full_join
+full_join(mice_color, mice_weight, by = "name")
+
+# these also work if your data frames are different lengths
+mini_mice <- data.frame(name = c("Mouse 3", "Mouse 5"), weight = c(18, 22), stringsAsFactors = FALSE)
+left_join(mice_color, mini_mice, by = "name")
+```
+
+`dplyr` also provides a non-row-aware function that combines columns from two data frames, `bind_cols()`. Use `bind_cols()` with caution, as it will match rows solely by position - if your two data frames don't have the same row order, `bind_cols()` can get you in serious trouble!
+
+```{r}
+mice_age <- data.frame(name = c("Mouse 1", "Mouse 2", "Mouse 3", "Mouse 4"), age = c(5, 6, 4, 5), stringsAsFactors = FALSE)
+
+# bind_cols
+bind_cols(mice_color, mice_age)
+# I'm keeping both `name` columns in order to show that we got the rows right
+
+# here's an example that gets the rows wrong
+bind_cols(mice_color, mice_weight)
+
+# bind_cols fails if your data frames aren't the exact same length
+#bind_cols(mice_color, mini_mice)
+```
+
+Usually, one of the row-aware functions will be a better choice than `bind_cols()`.
+
+### Functions that combine or otherwise work with rows
+
+`dplyr` functions that combine rows from two data frames come in three broad categories. First, there are functions that filter the rows of one data frame based on the rows of another data frame: `semi_join()` and `anti_join()`. These can be helpful for figuring out what rows will be kept/dropped if you use `left_join()` or `right_join()` on the data frames.
+
+```{r}
+mice_color2 <- data.frame(name = c("Mouse 1", "Mouse 2", "Mouse 3", "Mouse 5"), color = c("black", "brown", "white", "white"), stringsAsFactors = FALSE)
+
+# semi_join
+semi_join(mice_color, mice_color2, by = "name")
+# anti_join
+anti_join(mice_color, mice_color2, by = "name")
+
+# these also work on data frames that have different sets of columns, as long as you have at least one column to join on
+semi_join(mice_color, mice_weight, by = "name")
+
+# row-joining functions don't care if the data frames have different numbers of rows
+```
+
+Second, there are functions that combine sets of rows from two data frames based on whether they appear in one or both data frames: `intersect()`, `union()`, and `setdiff()`.
+
+```{r}
+# intersect
+intersect(mice_color, mice_color2)
+# union
+union(mice_color, mice_color2)
+# setdiff
+setdiff(mice_color, mice_color2)
+```
+
+`intersect()` is similar to `semi_join()`, and `setdiff()` is similar to `anti_join()`. However, these functions only work on data frames that have all the same columns.
+
+```{r}
+# this throws an error:
+#intersect(mice_color, mice_weight)
+```
+
+Lastly, there is `bind_rows()`, which works a lot like `full_join()`. Unlike `bind_cols()`, `bind_rows()` *is* column-aware.
+
+```{r}
+more_mice <- data.frame(name = c("Mouse 6", "Mouse 7", "Mouse 8", "Mouse 9"), color = c("white", "brown", "black", "black"), stringsAsFactors = FALSE)
+
+# bind_rows
+# example with all the same columns
+bind_rows(mice_color, more_mice)
+# example with some different columns
+bind_rows(mice_weight, more_mice)
+```
+
+Note that bind_rows does not pay any attention to the contents of those rows, so you can get some repeats if you try to combine tables that share contents.
+
+```{r}
+bind_rows(mice_color, mini_mice)
+# Mouse 3 repeats, with a color in one row and a weight in the other
+```
+
+Often, one of the column-binding functions will actually turn out to be a better choice than `bind_rows()`.
+
+```{r}
+full_join(mice_color, mini_mice)
+# Mouse 3 no longer repeats, and it has a color and a weight combined in the same row
+```
+
+
+# Resources
+
+`dplyr` / data manipulation cheatsheet: https://github.com/rstudio/cheatsheets/blob/main/data-transformation.pdf
+
+`stringr` cheatsheet: https://github.com/rstudio/cheatsheets/blob/main/strings.pdf
+
