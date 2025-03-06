@@ -7,16 +7,12 @@ title: Research
 
 ### Phenotypic plasticity in pea aphids
 
-Pea aphids exhibit a dramatic wing polyphenism which is environmentally regulated in females. I use pea aphids in my research in order to understand how plasticity and polyphenisms may evolve and be regulated over time.
+I work on the evolution of phenotypic plasticity and the response of organisms to environments using the pea aphid *Acyrthosiphon pisum*. Asexually-reproducing (i.e., clonal) pea aphid females display a developmental plasticity for wing phenotypes that is transgenerational: mother aphids sense environmental cues (conspecific density) and direct their offspring to develop as winged or wingless, with winged forms produced more frequently in crowded environments. I leverage variation in this system order to better understand the nature and evolution of plasticity.
 
-### Where do genes involved in regulating wing plasticity come from?
+### Variation in the strength of wing plasticity
 
-Using transcriptomics, we can determine what genes are upregulated or downregulated in aphids exposed to different environmental conditions (see our recent [paper](https://onlinelibrary.wiley.com/doi/10.1111/evo.14174)). I ask whether these plasticity-related genes are vertically inherited from insect ancestors, or whether some may be derived from horizontal gene transfer events.
+Some pea aphid lines display high plasticity (a large increase in the proportion of winged offspring) when exposed to crowding, accompanied by a strong transcriptional response, while others display low plasticity (little to no change in the proportion of winged offspring) and little to no transcriptional response ([see our 2021 paper](https://doi.org/10.1111/evo.14174)).
 
-### What is the genetic basis of variation in plasticity between pea aphid lines and biotypes?
+My [recent paper](https://doi.org/10.1093/jhered/esaf006) demonstrated that variation in the strength of plasticity is heritable and appears to have a multigenic basis. I employed a laboratory cross between a high plasticity line and a low plasticity line and pinpointed one of the contributing loci.
 
-The pea aphid species is subdivided into a number of biotypes which have diverged and specialized to live on different host plants over the past tens to hundreds of thousands of years. [We observed](https://onlinelibrary.wiley.com/doi/10.1111/evo.14174) that some biotypes have strong plasticity, while other biotypes seem to have nearly or completely lost the plasticity, and with it the ability to produce the winged phenotype. I am conducting a QTL mapping study to understand what genetic changes may have occurred to produce this plasticity loss.
-
-### How can plasticity be transgenerationally regulated?
-
-The pea aphid wing plasticity is transgenerational, with a mother aphid's environment determining the phenotype of her offspring. However, only wingless mothers appear to be capable of this plasticity; winged mothers consistently produce only wingless offspring in all environments. I seek to understand the relationship between phenotype and capacity for plasticity, as well as to determine whether this effect persists past a single generation (i.e., to granddaughters, great-granddaughters, etc. of winged aphids).
+In a second [recent paper](https://doi.org/10.1111/mec.17660), we examined an association mapping population and detected a candidate plasticity variation locus as well as effects of an aphid endosymbiont on the strength of plasticity. In contrast, we found no association between the strength of plasticity and body color - a previously rumored connection.
